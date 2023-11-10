@@ -1,0 +1,164 @@
+1.Take 2 numbers from user and add them
+
+
+namespace FirstApp
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            int num1;
+            int num2;
+            Console.WriteLine("enter the numbers:");
+            num1 = Convert.ToInt32(Console.ReadLine());
+            num2 = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine($"The sum of {num1} and{num2} is {num1+num2}");
+
+        }
+    }
+}
+===========================================================================================================================
+
+2.Take two number from user and print the biggest
+
+
+namespace FirstApp
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            int num1;
+            int num2;
+            Console.WriteLine("enter the numbers:");
+            num1 = Convert.ToInt32(Console.ReadLine());
+            num2 = Convert.ToInt32(Console.ReadLine());
+            if (num1 > num2)
+                Console.WriteLine($"The Biggest number is num1:{num1}");
+            else
+                Console.WriteLine($"The Biggest umber is num2:{num2}");
+
+
+        }
+    }
+}
+
+=================================================================================================================================
+3.Take a number from user ad check if it is even
+
+
+namespace FirstApp
+{
+    internal class Program
+    {
+        static void CheckEvenNumber()
+        {
+            int n;
+            Console.WriteLine("Enter the number:");
+            n= Convert.ToInt32(Console.ReadLine());
+            if (n%2 == 0)
+            {
+                Console.WriteLine($"The Number is {n} even");
+            }
+            else
+            {
+                Console.WriteLine($"The Number is {n} not even");
+            }
+        }
+        static void Main(string[] args)
+        {
+            CheckEvenNumber();
+        }
+    }
+}
+
+===============================================================================================================================================
+4.Take a number from user and find if it is prime or not
+
+namespace FirstApp
+{
+    internal class Program
+    {
+        static void CheckPrimeNumber()
+        {
+            int n,m=0,flag=0;
+            Console.WriteLine("Enter the number:");
+            n= Convert.ToInt32(Console.ReadLine());
+            m = n / 2;
+            for (int i = 2; i <=m; i++)
+            {
+                if(n%i==0)
+                {
+                    Console.WriteLine("The number is not prime:" + n);
+                    flag = 1;
+                    break;
+                }
+            }
+            if(flag == 0)
+            {
+                Console.WriteLine($"{n} is prime");
+            }
+
+        }
+        static void Main(string[] args)
+        {
+            CheckPrimeNumber();
+        }
+    }
+}
+
+===============================================================================================================================================
+
+5.Take a Number from user find its square
+
+namespace FirstApp
+{
+    internal class Program
+    {
+        static void SquareNumber()
+        {
+            int n,p;
+            Console.WriteLine("Enter the number:");
+            n= Convert.ToInt32(Console.ReadLine());
+            p = n * n;
+            Console.WriteLine($"The Square number of n is {p}");
+            
+
+        }
+        static void Main(string[] args)
+        {
+           SquareNumber();
+        }
+    }
+}
+==================================================================================================================================================
+
+6.Take a 10 numbers from user and find the average of them
+
+namespace FirstApp
+{
+    internal class Program
+    {
+        static void AverageNumber()
+        {
+            int n,m=0,x,p;
+            Console.WriteLine("Enter the number:");
+            n= Convert.ToInt32(Console.ReadLine());
+            for(int i=0; i<n; i++)
+            {
+                x=Convert.ToInt32(Console.ReadLine());
+                m = m + x;
+               
+
+            }
+            p = m / n;
+            Console.WriteLine($"The average of {n} numbers is {p}");
+        }
+        static void Main(string[] args)
+        {
+           AverageNumber();
+        }
+    }
+}
+
+

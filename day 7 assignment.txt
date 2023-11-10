@@ -1,0 +1,157 @@
+ -- print the books that have 'e' and 'a' in their name
+ 
+select title 'Book Name' from titles
+ where title like'%e%' and title like'%a%'
+===================================================================================
+--print the store name, title name,, quantity, sale amount, pulisher name, author name for all the sales. Also print those books which have not been sold and authors who have not written.
+
+SELECT
+    st.stor_name AS store_name,
+    t.title AS title,
+    sum(s.qty) AS quantity,
+    sum(t.price) AS sale_amount,
+    p.pub_name AS publisher_name,
+    CONCAT(a.au_fname, ' ', a.au_lname) AS author_name
+FROM
+    sales s
+INNER JOIN
+    stores st ON s.stor_id = st.stor_id
+INNER JOIN
+    titles t ON s.title_id = t.title_id
+INNER JOIN
+    publishers p ON t.pub_id = p.pub_id
+INNER JOIN
+    titleauthor ta ON ta.title_id = t.title_id
+INNER JOIN
+    authors a ON ta.au_id = a.au_id
+GROUP BY
+    st.stor_name,
+    t.title,
+	p.pub_name,
+	a.au_fname,
+    a.au_lname;
+
+======================================================================================
+print the details of the sale when the sale quantity is greater than the sale quantity of all the same titles sold in the same store
+SELECT
+    s.stor_id AS 'Store ID',
+    s.title_id AS 'Title ID',
+    t.title AS 'Title',
+    s.qty AS 'Sale Quantity',
+    s.ord_date AS 'Sale Date'
+FROM sales s
+left JOIN (
+    SELECT
+        s.stor_id,
+        s.title_id,
+        MAX(s.qty) AS max_qty
+    FROM sales s
+    GROUP BY s.stor_id, s.title_id
+) max_sale_qty ON s.stor_id = max_sale_qty.stor_id
+    AND s.title_id = max_sale_qty.title_id
+    AND s.qty > max_sale_qty.max_qty
+JOIN titles t ON s.title_id = t.title_id;
+=======================================================================================================
+Find a way to ensure that the price of books are not updated if the price is below 7
+
+CREATE TRIGGER check_price_before_update
+ON titles 
+instead of insert
+AS
+BEGIN
+    DECLARE
+	@title_id varchar(6),
+	@title varchar(60),
+	@type char(12),
+	@pub_id char(4),
+	@price money,
+	@advance money,
+	@royalty int,
+	@ytd_sales int,
+	@notes varchar(200),
+	@pubdate datetime,
+	@new_price DECIMAL(10,2);
+    SET @new_price = (SELECT  price FROM inserted);
+
+    IF @new_price < 7
+    BEGIN
+        PRINT 'The price cannot be updated to below 7';
+    END;
+	ELSE
+	BEGIN
+		insert into titles values(@title_id,@title,@type,@pub_id,@price,@advance,@royalty ,@ytd_sales ,@notes,@pubdate)
+	END;
+END;
+
+
+insert into titles values('AU1099','Learn From Failures',
+		'psychology','0599',6.00,15000.00,25,333,
+		'Here you can face fear of Failures','2023-10-30 00:00:00:000')
+==============================================================================================================================
+Print the average price of every author's books withthe author's full name
+
+SELECT concat(au_lname,au_fname) AS author_full_name, AVG(price) AS average_price
+FROM authors a join titleauthor ta on a.au_id=ta.au_id
+join titles t on ta.title_id=t.title_id 
+group by concat(au_lname,au_fname)
+=====================================================================================================================
+
+--Print the schema of the titles table and locate all the constrants
+
+SHOW CREATE TABLE titles
+SELECT constraint_name, constraint_type
+FROM information_schema.table_constraints
+WHERE table_name = 'titles';
+==============================================================================================================
+Create a stored procedure that will take the author name and print the total sales amount for all the books authored by him/her
+  Note : - If there are no books sold then print "Sale yet to gear u
+
+
+Create the stored procedure
+CREATE PROCEDURE GetTotalSalesByAuthor
+    @AuthorName VARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @TotalSales DECIMAL(10, 2);
+
+    -- Calculate the total sales amount for the author's books
+    SELECT @TotalSales = ISNULL(SUM(Sales.qty * Titles.price), 0)
+    FROM authors
+    INNER JOIN titleauthor ON authors.au_id = titleauthor.au_id
+    INNER JOIN titles ON titleauthor.title_id = titles.title_id
+    LEFT JOIN sales ON titles.title_id = sales.title_id
+    WHERE authors.au_lname + ', ' + authors.au_fname = @AuthorName;
+
+    -- Check if there are sales for the author's books
+    IF @TotalSales > 0
+    BEGIN
+        PRINT 'Total sales amount for ' + @AuthorName + ': $' + CONVERT(VARCHAR, @TotalSales);
+    END
+    ELSE
+    BEGIN
+        PRINT 'Sales yet to heat up for ' + @AuthorName;
+    END
+END;
+
+EXEC GetTotalSalesByAuthor 'Author Name';
+================================================================================================================
+Create a procedure that will take the price and prints the count of book that are priced less than that
+
+create procedure proc_CountBooksPricedLessThan 
+	@Price decimal(10, 2)
+as
+begin
+    declare @BookCount int
+    select @BookCount = count(*)
+    from titles
+    where price < @Price
+
+    -- Print the count
+    PRINT 'Count of books priced less than ' + CAST(@Price AS VARCHAR) + ': ' + CAST(@BookCount AS VARCHAR)
+END
+
+EXEC proc_CountBooksPricedLessThan 20.00
+
+

@@ -1,0 +1,297 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DoctorApp
+{
+    internal class DoctorRepository
+    {
+        private List<Doctor> doctors;
+        private int doctorIdCounter;
+
+        public DoctorRepository()
+        {
+            doctors = new List<Doctor>();
+            doctorIdCounter = 1;
+        }
+
+        int GetNextId()
+        {
+            if (doctors.Count == 0)
+                return 1;
+            int id = doctors[doctors.Count - 1].Id;
+            return ++id;
+        }
+
+        public Doctor Add()
+        {
+            int id = GetNextId();
+            Doctor doctor = new Doctor();
+            doctor.Id = id;
+
+            Console.Write("Enter doctor's name: ");
+            doctor.Name = Console.ReadLine();
+
+            Console.Write("Enter doctor's phone number: ");
+            doctor.Phone = Console.ReadLine();
+
+            Console.Write("Enter doctor's experience (in years): ");
+            if (int.TryParse(Console.ReadLine(), out int experience))
+            {
+                doctor.Experience = experience;
+            }
+            else
+            {
+                Console.WriteLine("Invalid experience. Setting experience to 0.");
+            }
+
+            doctors.Add(doctor);
+            doctorIdCounter++;
+
+            Console.WriteLine($"Doctor {doctor.Name} added with ID {doctor.Id}");
+            return doctor;
+        }
+
+        public List<Doctor> GetDoctors()
+        {
+            return doctors;
+        }
+
+        public Doctor GetDoctorById(int id)
+        {
+            return doctors.Find(d => d.Id == id);
+        }
+
+        public Doctor ModifyPhone(int id, string newPhone)
+        {
+            Doctor doctor = GetDoctorById(id);
+            if (doctor != null)
+            {
+                doctor.Phone = newPhone;
+                Console.WriteLine($"Phone number updated for Dr. {doctor.Name}");
+                return doctor;
+            }
+            return null;
+        }
+
+        public Doctor ModifyExperience(int id, int newExperience)
+        {
+            Doctor doctor = GetDoctorById(id);
+            if (doctor != null)
+            {
+                doctor.Experience = newExperience;
+                Console.WriteLine($"Experience updated for Dr. {doctor.Name}");
+                return doctor;
+            }
+            return null;
+        }
+
+        public Doctor Delete(int id)
+        {
+            Doctor doctor = GetDoctorById(id);
+            if (doctor != null)
+            {
+                doctors.Remove(doctor);
+                Console.WriteLine($"Doctor Dr. {doctor.Name} with ID {id} deleted");
+                return doctor;
+            }
+            return null;
+        }
+    }
+
+
+}
+====================================================================================
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+
+namespace DoctorApp
+{
+    internal class Doctor
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Phone { get; set; }
+        public int Experience { get; set; }
+
+        public Doctor()
+        {
+            Experience = 0;
+        }
+
+        public Doctor(int id, string name, string phone, int experience)
+        {
+            Id = id;
+            Name = name;
+            Phone = phone;
+            Experience = experience;
+        }
+
+        public override string ToString()
+        {
+            return $"Doctor ID: {Id}\nDoctor Name: {Name}\nDoctor Phone: {Phone}\nDoctor Experience: {Experience} years";
+        }
+    }
+}
+=======================================================
+namespace DoctorApp
+{
+    internal class DoctorApp
+    {
+        private DoctorRepository doctorRepository;
+
+        public DoctorApp()
+        {
+            doctorRepository = new DoctorRepository();
+        }
+
+        public void AdminPanel()
+        {
+            while (true)
+            {
+                Console.WriteLine("\nAdmin Panel");
+                Console.WriteLine("1. Add Doctor");
+                Console.WriteLine("2. Modify Doctor Phone");
+                Console.WriteLine("3. Modify Doctor Experience");
+                Console.WriteLine("4. Delete Doctor");
+                Console.WriteLine("5. Print All Doctors");
+                Console.WriteLine("6. Back to main menu");
+
+                Console.Write("Select an action (1/2/3/4/5/6): ");
+                string adminChoice = Console.ReadLine();
+
+                switch (adminChoice)
+                {
+                    case "1":
+                        doctorRepository.Add();
+                        break;
+                    case "2":
+                        ModifyPhone();
+                        break;
+                    case "3":
+                        ModifyExperience();
+                        break;
+                    case "4":
+                        DeleteDoctor();
+                        break;
+                    case "5":
+                        PrintAllDoctors();
+                        break;
+                    case "6":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid choice. Please select a valid option.");
+                        break;
+                }
+            }
+        }
+
+        void ModifyPhone()
+        {
+            Console.Write("Enter the ID of the doctor to modify phone: ");
+            if (int.TryParse(Console.ReadLine(), out int doctorId))
+            {
+                Console.Write("Enter the new phone number: ");
+                string newPhone = Console.ReadLine();
+                doctorRepository.ModifyPhone(doctorId, newPhone);
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a valid doctor ID.");
+            }
+        }
+
+        void ModifyExperience()
+        {
+            Console.Write("Enter the ID of the doctor to modify experience: ");
+            if (int.TryParse(Console.ReadLine(), out int doctorId))
+            {
+                Console.Write("Enter the new experience (in years): ");
+                if (int.TryParse(Console.ReadLine(), out int newExperience))
+                {
+                    doctorRepository.ModifyExperience(doctorId, newExperience);
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter a valid experience value.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a valid doctor ID.");
+            }
+        }
+
+        void DeleteDoctor()
+        {
+            Console.Write("Enter the ID of the doctor to delete: ");
+            if (int.TryParse(Console.ReadLine(), out int doctorId))
+            {
+                doctorRepository.Delete(doctorId);
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a valid doctor ID.");
+            }
+        }
+
+        void PrintAllDoctors()
+        {
+            Console.WriteLine("All Doctors:");
+            var doctors = doctorRepository.GetDoctors();
+            foreach (var doctor in doctors)
+            {
+                Console.WriteLine(doctor);
+                Console.WriteLine("----------------------------");
+            }
+        }
+
+        public void Run()
+        {
+            Console.WriteLine("Welcome to the Doctor Management System");
+            while (true)
+            {
+                Console.WriteLine("\nMain Menu");
+                Console.WriteLine("1. Admin Panel");
+                Console.WriteLine("2. Exit");
+                Console.Write("Select an option (1/2): ");
+                string choice = Console.ReadLine();
+
+                if (choice == "1")
+                {
+                    AdminPanel();
+                }
+                else if (choice == "2")
+                {
+                    Console.WriteLine("Exiting the application.");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid choice. Please select a valid option.");
+                }
+            }
+        }
+        static void Main(string[] args)
+        {
+            DoctorApp app = new DoctorApp();
+            app.Run();
+        }
+    }
+}
+
+v
+
+
+
+
+
+
+

@@ -1,0 +1,94 @@
+------------------------------------set 1---------------------------------------------------
+*select * from titles where pub_id='1389'
+
+*select title 'books' from titles where price between 10 and 15
+
+*select title 'books' from titles where price is null
+
+*select title 'books' from titles where title like'the%'
+
+*select title 'books' from titles where title not like('%v%')
+
+*select title 'books'  from titles order by royalty desc, type,price desc
+
+*select avg(price) 'avg_price',type from titles  group by type
+
+*select distinct type from titles
+
+*select top 2 title'book' from titles order by price desc 
+
+*select title'books'from titles where type = 'business' and price<20 and advance>7000
+
+*select au_fname from authors where state='ca'
+
+*select state,count(au_fname) from authors group by state
+
+-------------------------------set 2------------------------------
+
+
+*select stor_id,count(ord_num)from sales group by stor_id
+
+*select title_id,count(ord_num)'order num' from sales group by title_id 
+
+*select t.title,p.pub_name from titles t 
+inner join publishers p on t.pub_id=p.pub_id
+
+*select CONCAT(au_lname,' ',au_fname)as au_fullname from authors
+
+*SELECT title, price, (price + price * 12.36/100) AS price_with_tax
+FROM titles;
+
+*SELECT authors.au_fname, titles.title
+FROM titleauthor
+JOIN authors ON titleauthor.au_id = authors.au_id
+JOIN titles ON titleauthor.title_id = titles.title_id;
+
+
+*SELECT authors.au_fname, titles.title,publishers.pub_name
+FROM titleauthor
+JOIN authors ON titleauthor.au_id = authors.au_id
+JOIN titles ON titleauthor.title_id = titles.title_id
+JOIN publishers ON publishers.pub_id=titles.pub_id
+
+
+
+*SELECT publishers.pub_id, publishers.pub_name, AVG(titles.price) AS avg_price
+FROM titles
+JOIN publishers ON titles.pub_id = publishers.pub_id
+GROUP BY publishers.pub_id, publishers.pub_name;
+
+
+*SELECT a.au_fname, t.title
+FROM authors AS a
+JOIN titleauthor AS ta ON a.au_id = ta.au_id
+JOIN titles AS t ON ta.title_id = t.title_id
+WHERE a.au_fname ='Marjorie';
+
+
+*SELECT a.pub_name, t.title,ta.ord_num
+FROM publishers AS a
+JOIN titles AS t ON a.pub_id = t.pub_id
+JOIN sales AS ta ON t.title_id = ta.title_id
+where pub_name='New Moon Books'
+
+
+*SELECT p.pub_id, p.pub_name, COUNT(s.ord_num) AS order_count
+FROM publishers AS p
+LEFT JOIN titles AS t ON p.pub_id = t.pub_id
+LEFT JOIN sales AS s ON t.title_id = s.title_id
+GROUP BY p.pub_id, p.pub_name;
+
+*SELECT s.ord_num, t.title, s.qty, t.price, (s.qty * t.price) AS total_price
+FROM sales AS s
+JOIN titles AS t ON s.title_id = t.title_id;
+
+*SELECT t.title, s.qty
+FROM sales AS s
+JOIN titles AS t ON s.title_id = t.title_id;
+
+*SELECT s.ord_num
+FROM titles AS t
+JOIN sales AS s ON t.title_id = s.title_id
+JOIN publishers AS p ON t.pub_id = p.pub_id
+JOIN employee AS e ON p.pub_id = e.pub_id
+WHERE e.fname = 'Paolo';
